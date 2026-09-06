@@ -1,0 +1,7 @@
+.DS_Store
+
+application/logs/*
+application/cache/sessions/*
+
+uploads/*
+!uploads/index.html

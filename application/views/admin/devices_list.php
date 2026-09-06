@@ -1,0 +1,5 @@
+<div class="content-wrapper"><section class="content"><div class="et-card"><div class="et-card-header"><h3>ครุภัณฑ์ทั้งหมด</h3></div>
+<div class="table-responsive"><table class="table et-table dataTable"><thead><tr><th>เลขครุภัณฑ์</th><th>ชื่ออุปกรณ์</th><th>ประเภท</th><th>สถานะ</th><th>รายละเอียด</th></tr></thead><tbody>
+<?php if(empty($query)): ?><tr><td colspan="5" class="et-empty">ยังไม่มีข้อมูลครุภัณฑ์</td></tr><?php else: foreach($query as $row): ?>
+<tr><td><?php echo html_escape($row->d_id); ?></td><td><strong><?php echo html_escape($row->d_name); ?></strong></td><td><?php echo html_escape($row->t_name); ?></td><td><?php echo html_escape($row->s_name); ?></td><td><?php echo html_escape($row->d_detail); ?></td></tr>
+<?php endforeach; endif; ?></tbody></table></div></div></section></div>
