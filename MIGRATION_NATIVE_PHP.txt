@@ -1,0 +1,27 @@
+EquipTrack - Native PHP Rewrite
+================================
+
+เวอร์ชันนี้ถูกเขียนใหม่จาก CodeIgniter 3 เป็น Native PHP + PDO
+ไม่มี application/controllers, application/models, system/, bootstrap framework หรือ plugins ของ CodeIgniter
+
+ฟังก์ชันหลัก
+- Login / Logout / Role access
+- Admin dashboard
+- จัดการผู้ใช้ / ประเภทผู้ใช้
+- จัดการครุภัณฑ์ / รูปครุภัณฑ์
+- ประเภทครุภัณฑ์ / สถานะ
+- นักศึกษาส่งคำขอยืม
+- เจ้าหน้าที่อนุมัติ / ปฏิเสธ
+- เจ้าหน้าที่บันทึกยืมโดยตรง
+- รับคืนปกติ / รับคืนชำรุด
+- ประวัติคืน / รายการชำรุด
+- Profile / เปลี่ยนรหัสผ่าน
+- Reports / Filter / Print / CSV
+- CSRF / Prepared Statement / Transaction + Row Lock
+- MySQL-backed PHP Session (app_sessions)
+- Responsive UI สำหรับ macOS และ Windows
+
+รูปครุภัณฑ์: uploads/devices/
+รูปผู้ใช้: uploads/members/
+ฐานข้อมูล: database/equiptrack_db.sql
+ตัวตรวจระบบ: setup_check.php

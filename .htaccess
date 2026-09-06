@@ -1,17 +1,7 @@
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-
-    # Windows/XAMPP compatibility: generated URLs contain index.php and must not
-    # be rewritten a second time. Clean legacy URLs are still accepted.
-    RewriteRule ^index\.php(?:/.*)?$ - [L]
-
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ index.php/$1 [L,QSA]
-</IfModule>
-
 Options -Indexes
-
-<FilesMatch "(^\.|\.(sql|log|ini|env|md)$|composer\.(json|lock)$)">
-    Require all denied
-</FilesMatch>
+DirectoryIndex index.php
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

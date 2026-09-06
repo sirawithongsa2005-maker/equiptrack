@@ -1,0 +1,23 @@
+<?php
+require __DIR__.'/includes/bootstrap.php';require_login();$u=current_user();$errors=[];
+if($_SERVER['REQUEST_METHOD']==='POST'){
+ verify_csrf();$action=post('action');
+ if($action==='profile'){
+  $fname=post('m_fname');$name=post('m_name');$lname=post('m_lname');$phone=post('m_phone');$email=post('m_email');
+  if($name==='')$errors[]='กรุณากรอกชื่อ';
+  if(!$errors){try{$img=upload_image('m_img','members',$u['m_img']??null);execute_sql('UPDATE tbl_member SET m_fname=?,m_name=?,m_lname=?,m_phone=?,m_email=?,m_img=? WHERE m_id=?',[$fname,$name,$lname,$phone,$email,$img,$u['m_id']]);flash('success','บันทึกข้อมูลส่วนตัวเรียบร้อย');redirect('profile.php');}catch(Throwable $e){$errors[]=$e->getMessage();}}
+ }elseif($action==='password'){
+  $current=(string)($_POST['current_password']??'');$new=(string)($_POST['new_password']??'');$confirm=(string)($_POST['confirm_password']??'');
+  if(!password_verify($current,(string)$u['m_password']))$errors[]='รหัสผ่านปัจจุบันไม่ถูกต้อง';
+  if(strlen($new)<4)$errors[]='รหัสผ่านใหม่ต้องมีอย่างน้อย 4 ตัวอักษร';
+  if($new!==$confirm)$errors[]='ยืนยันรหัสผ่านใหม่ไม่ตรงกัน';
+  if(!$errors){execute_sql('UPDATE tbl_member SET m_password=? WHERE m_id=?',[password_hash($new,PASSWORD_DEFAULT),$u['m_id']]);flash('success','เปลี่ยนรหัสผ่านเรียบร้อย');redirect('profile.php');}
+ }
+}
+$u=fetch_one('SELECT m.*,p.pname FROM tbl_member m JOIN tbl_position p ON p.pid=m.ref_pid WHERE m.m_id=?',[$u['m_id']]);render_header('โปรไฟล์ของฉัน','profile');
+?>
+<div class="page-intro"><div><h2>ข้อมูลบัญชี</h2><p>แก้ไขข้อมูลส่วนตัว รูปโปรไฟล์ และรหัสผ่านได้จากหน้านี้</p></div></div><?php if($errors):?><div class="inline-alert danger"><b>!</b><span><?=implode('<br>',array_map('e',$errors))?></span></div><?php endif;?>
+<div class="card card-pad"><div class="profile-hero"><?php if($img=member_image($u)):?><img class="profile-photo" src="<?=e($img)?>" alt=""><?php else:?><div class="profile-photo"><?=e(user_initial($u))?></div><?php endif;?><div><h2><?=e(full_name($u))?></h2><p>@<?=e($u['m_username'])?></p><div class="meta-row"><span class="meta-pill"><?=e($u['pname'])?></span><span class="meta-pill">สมาชิกตั้งแต่ <?=e(thai_date($u['m_datesave']))?></span></div></div></div></div>
+<div class="grid grid-2 mt-2"><div class="card"><div class="card-header"><div><h3>แก้ไขข้อมูลส่วนตัว</h3><p>ข้อมูลสำหรับแสดงผลและติดต่อ</p></div></div><div class="card-body"><form method="post" enctype="multipart/form-data"><?=csrf_field()?><input type="hidden" name="action" value="profile"><div class="form-grid"><div class="form-group"><label>คำนำหน้า</label><input class="form-control" name="m_fname" maxlength="30" value="<?=e($u['m_fname'])?>"></div><div class="form-group"><label>ชื่อ <span class="required">*</span></label><input class="form-control" name="m_name" maxlength="100" required value="<?=e($u['m_name'])?>"></div><div class="form-group"><label>นามสกุล</label><input class="form-control" name="m_lname" maxlength="100" value="<?=e($u['m_lname'])?>"></div><div class="form-group"><label>เบอร์โทร</label><input class="form-control" name="m_phone" maxlength="20" value="<?=e($u['m_phone'])?>"></div><div class="form-group full"><label>อีเมล / รหัสนักศึกษา</label><input class="form-control" name="m_email" maxlength="120" value="<?=e($u['m_email'])?>"></div><div class="form-group full"><label>รูปโปรไฟล์</label><div class="image-uploader"><div class="image-preview" id="profilePreview"><?php if($img):?><img src="<?=e($img)?>" alt=""><?php else:?>รูป<?php endif;?></div><div class="upload-copy"><small class="form-help">JPG, PNG, WEBP ไม่เกิน 5 MB</small><input type="file" name="m_img" accept="image/jpeg,image/png,image/webp" data-preview="#profilePreview"></div></div></div></div><div class="form-actions mt-2"><button class="btn btn-primary">บันทึกข้อมูล</button></div></form></div></div>
+<div class="card"><div class="card-header"><div><h3>เปลี่ยนรหัสผ่าน</h3><p>ใช้รหัสผ่านอย่างน้อย 4 ตัวอักษร</p></div></div><div class="card-body"><form method="post"><?=csrf_field()?><input type="hidden" name="action" value="password"><div class="form-group"><label>รหัสผ่านปัจจุบัน</label><input class="form-control" type="password" name="current_password" required autocomplete="current-password"></div><div class="form-group mt-2"><label>รหัสผ่านใหม่</label><input class="form-control" type="password" name="new_password" minlength="4" required autocomplete="new-password"></div><div class="form-group mt-2"><label>ยืนยันรหัสผ่านใหม่</label><input class="form-control" type="password" name="confirm_password" minlength="4" required autocomplete="new-password"></div><div class="form-actions mt-2"><button class="btn btn-primary">เปลี่ยนรหัสผ่าน</button></div></form></div></div></div>
+<?php render_footer();?>

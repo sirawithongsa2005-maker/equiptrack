@@ -1,65 +1,62 @@
-# EquipTrack — macOS + Windows
+# EquipTrack — Native PHP + MySQL
 
-ระบบยืม–คืนครุภัณฑ์ด้วย CodeIgniter 3 สำหรับ XAMPP โดยใช้ **โค้ด ZIP ชุดเดียวกันทั้ง macOS และ Windows**
+เวอร์ชันนี้เขียนใหม่เป็น **PHP ล้วน (Native PHP)** ไม่ใช้ CodeIgniter และไม่ใช้ PHP Framework
 
-## ตำแหน่งโปรเจกต์
+## โครงสร้าง
+- `config/` ตั้งค่าระบบและฐานข้อมูล
+- `includes/` ฟังก์ชันกลาง, PDO, Auth, CSRF, Session, Layout
+- `admin/` ผู้ดูแลระบบ
+- `staff/` เจ้าหน้าที่ / ครุภัณฑ์ / ยืม–คืน
+- `student/` ผู้ยืม
+- `reports/` รายงานและ Export CSV
+- `assets/` CSS + JavaScript ของ EquipTrack
+- `uploads/devices/` รูปครุภัณฑ์
+- `uploads/members/` รูปผู้ใช้
+- `database/equiptrack_db.sql` ฐานข้อมูลติดตั้งใหม่ไฟล์เดียว
 
-- Windows: `C:\xampp\htdocs\equiptrack`
-- macOS: `/Applications/XAMPP/xamppfiles/htdocs/equiptrack`
+## ติดตั้ง macOS + XAMPP
+1. วางโฟลเดอร์ที่ `/Applications/XAMPP/xamppfiles/htdocs/equiptrack`
+2. เปิด Apache และ MySQL
+3. เข้า `http://localhost/phpmyadmin/`
+4. Import `database/equiptrack_db.sql`
+5. เปิด `http://localhost/equiptrack/`
 
-โค้ดไม่ hard-code ตำแหน่งทั้งสองแบบ แต่ใช้ `FCPATH` และ `DIRECTORY_SEPARATOR` จึงย้ายระหว่าง Mac/Windows ได้โดยไม่แก้ Controller หรือ Model
+หากอัปโหลดรูปไม่ได้บน Mac:
+```bash
+cd /Applications/XAMPP/xamppfiles/htdocs/equiptrack
+sudo chown -R daemon:staff uploads
+sudo chmod -R 775 uploads
+```
 
-## ติดตั้ง
-
-1. แตก ZIP เป็นโฟลเดอร์ `equiptrack` ใน `htdocs`
-2. Start Apache และ MySQL ใน XAMPP
-3. เปิด phpMyAdmin แล้ว Import `database/equiptrack_db.sql`
+## ติดตั้ง Windows + XAMPP
+1. วางโฟลเดอร์ที่ `C:\xampp\htdocs\equiptrack`
+2. เปิด Apache และ MySQL
+3. Import `database\equiptrack_db.sql` ใน phpMyAdmin
 4. เปิด `http://localhost/equiptrack/`
 
-รายละเอียดแยกตามระบบอยู่ใน `INSTALL_MAC_WINDOWS.txt`
-
-## ฐานข้อมูล
-
-ค่าเริ่มต้น:
-
-- Host: `127.0.0.1`
-- Port: `3306`
-- User: `root`
-- Password: ว่าง
-- Database: `equiptrack_db`
-
-สามารถ override ผ่าน `EQUIPTRACK_DB_HOST`, `EQUIPTRACK_DB_PORT`, `EQUIPTRACK_DB_USER`, `EQUIPTRACK_DB_PASS`, `EQUIPTRACK_DB_NAME`
-
 ## บัญชีเริ่มต้น
-
 - Admin: `admin` / `admin`
 - Staff: `staff` / `staff`
 - Student: `student` / `student`
 
-ควรเปลี่ยนรหัสผ่านหลังติดตั้ง
+## ตรวจระบบ
+เปิด `http://localhost/equiptrack/setup_check.php`
 
-## ความเข้ากันได้ที่ปรับไว้
+## ฐานข้อมูล
+ค่าเริ่มต้นใน `config/database.php`:
+- Host: `127.0.0.1`
+- Port: `3306`
+- Database: `equiptrack_db`
+- Username: `root`
+- Password: ว่าง
 
-- base URL ตรวจ host/port/path อัตโนมัติ
-- ใช้ `index.php` routing จึงไม่ต้องพึ่ง mod_rewrite
-- Session เก็บใน `ci_sessions`
-- มี safeguard สร้าง `ci_sessions` หากตารางหาย
-- Upload ใช้ absolute path จาก `FCPATH`
-- รูปผู้ใช้เก็บใน `uploads`
-- รูปครุภัณฑ์เก็บใน `devices`
-- ไม่ใช้ path แบบ `C:\...` หรือ `/Applications/...` ในโค้ดระบบ
-- ป้องกันการรัน PHP ในโฟลเดอร์อัปโหลด
-- รองรับฐานข้อมูล MySQL/MariaDB ของ XAMPP
+สามารถใช้ Environment Variables: `EQUIPTRACK_DB_HOST`, `EQUIPTRACK_DB_PORT`, `EQUIPTRACK_DB_NAME`, `EQUIPTRACK_DB_USER`, `EQUIPTRACK_DB_PASS`
 
-## ถ้าอัปโหลดรูปไม่ได้บน macOS
-
-ให้ตรวจ owner/permission ของ `uploads` และ `devices`; คำสั่งแนะนำอยู่ใน `INSTALL_MAC_WINDOWS.txt`
-
-## ก่อนนำขึ้น Hosting จริง
-
-- เปลี่ยนรหัสผ่านบัญชีตัวอย่าง
-- เปลี่ยน `encryption_key`
-- ตั้ง `ENVIRONMENT` เป็น `production`
-- ใช้บัญชีฐานข้อมูลเฉพาะระบบแทน root
-- จำกัด permission ตาม user ของ Apache/PHP
-# equiptrack
+## ความปลอดภัย/ความเสถียร
+- PDO Prepared Statements
+- `password_hash()` / `password_verify()`
+- CSRF token ทุก POST
+- Session เก็บใน MySQL (`app_sessions`) ไม่พึ่ง temp folder ของ OS
+- Transaction + `FOR UPDATE` ในกระบวนการยืม–คืน
+- จำกัด MIME/ขนาดไฟล์อัปโหลด
+- ปิดการรัน PHP ในโฟลเดอร์ uploads

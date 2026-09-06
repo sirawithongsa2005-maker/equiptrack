@@ -1,5 +1,0 @@
-<div class="content-wrapper"><section class="content"><div class="et-card"><div class="et-card-header"><h3>รายการกำลังยืม</h3></div>
-<div class="table-responsive"><table class="table et-table dataTable"><thead><tr><th>นักศึกษา</th><th>อุปกรณ์</th><th>วันที่ยืม</th><th>ผู้อนุมัติ</th><th>จัดการ</th></tr></thead><tbody>
-<?php if(empty($query)): ?><tr><td colspan="5" class="et-empty">ไม่มีอุปกรณ์ที่กำลังถูกยืม</td></tr><?php else: foreach($query as $row): ?>
-<tr><td><strong><?php echo html_escape(trim($row->m_fname.$row->m_name.' '.$row->m_lname)); ?></strong><small><?php echo html_escape($row->m_email); ?></small></td><td><strong><?php echo html_escape($row->d_name); ?></strong><small><?php echo html_escape($row->d_id); ?></small></td><td><?php echo html_escape($row->ser_date_lend); ?></td><td><?php echo html_escape($row->ser_staff_name_lend); ?></td><td><a href="<?php echo site_url('staff/return_lend/'.$row->ser_id); ?>" class="btn btn-primary btn-xs">รับคืน</a></td></tr>
-<?php endforeach; endif; ?></tbody></table></div></div></section></div>
